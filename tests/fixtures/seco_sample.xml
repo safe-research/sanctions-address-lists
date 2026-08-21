@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sanctions-list xmlns="urn:seco:sanctions">
+  <sanctions-set>
+    <identity id="1">
+      <identification-document type="passport" number="X1234567"/>
+      <address>
+        <remark>Known crypto wallet address: 0x1234567890abcdef1234567890ABCDEF12345678 used for transfers.</remark>
+      </address>
+    </identity>
+    <identity id="2">
+      <other-information>No blockchain details for this entry.</other-information>
+    </identity>
+  </sanctions-set>
+</sanctions-list>

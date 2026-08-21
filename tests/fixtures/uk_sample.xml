@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Designations xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <DateGenerated>20/08/2026</DateGenerated>
+  <Designation>
+    <UniqueID>TEST0001</UniqueID>
+    <Names>
+      <Name>
+        <Name6>Example Entity One</Name6>
+        <NameType>Primary Name</NameType>
+      </Name>
+    </Names>
+    <OtherInformation>No crypto information for this entry.</OtherInformation>
+    <CryptoWalletAddresses>
+      <CryptoWalletAddress>0x1234567890abcdef1234567890ABCDEF12345678</CryptoWalletAddress>
+    </CryptoWalletAddresses>
+  </Designation>
+  <Designation>
+    <UniqueID>TEST0002</UniqueID>
+    <Names>
+      <Name>
+        <Name6>Example Entity Two</Name6>
+        <NameType>Primary Name</NameType>
+      </Name>
+    </Names>
+    <OtherInformation>Known crypto wallet address: 0x2222222222222222222222222222222222222222 used for fundraising.</OtherInformation>
+  </Designation>
+  <Designation>
+    <UniqueID>TEST0003</UniqueID>
+    <Names>
+      <Name>
+        <Name6>Example Entity Three</Name6>
+        <NameType>Primary Name</NameType>
+      </Name>
+    </Names>
+    <UKStatementofReasons>General reasons text with no address.</UKStatementofReasons>
+  </Designation>
+</Designations>
