@@ -1,8 +1,21 @@
 name: Publish sanctions address lists
+# Runs the full pipeline against live sources and keeps the "latest" GitHub
+# Release up to date with the results:
+#   - CSV/JSON/TXT assets are only re-uploaded when a source's address list
+#     actually changed since the last publish (byte-compared against the
+#     currently published release, see the "Check for changes" step below).
+#   - manifest.json is refreshed every run regardless, so its status/counts/
+#     retrieved_at stay current even on a day with no address changes.
+#   - A source that fails doesn't block the others: whatever succeeded still
+#     gets published, and the job is marked failed for visibility.
 
 on:
   schedule:
+    # 04:17 UTC, daily. Off-the-hour to avoid the traffic spike most
+    # scheduled workflows create by running exactly on the hour.
     - cron: "17 4 * * *"
+  # Lets a maintainer trigger this manually from the Actions tab (or `gh
+  # workflow run publish.yml`) instead of waiting for the next schedule.
   workflow_dispatch: {}
 
 permissions:
