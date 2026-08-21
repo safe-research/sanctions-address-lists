@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CONSOLIDATED_LIST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.un.org/sc/resources/sc-sanctions.xsd" dateGenerated="2026-08-19T23:00:03.213Z">
+  <INDIVIDUALS>
+    <INDIVIDUAL>
+      <DATAID>1000001</DATAID>
+      <FIRST_NAME>Example</FIRST_NAME>
+      <SECOND_NAME>Person</SECOND_NAME>
+      <COMMENTS1>Known blockchain wallet addresses: 0x1234567890abcdef1234567890ABCDEF12345678.</COMMENTS1>
+    </INDIVIDUAL>
+    <INDIVIDUAL>
+      <DATAID>1000002</DATAID>
+      <FIRST_NAME>Another</FIRST_NAME>
+      <SECOND_NAME>Person</SECOND_NAME>
+      <COMMENTS1>No relevant financial technology details.</COMMENTS1>
+    </INDIVIDUAL>
+  </INDIVIDUALS>
+  <ENTITIES>
+    <ENTITY>
+      <DATAID>2000001</DATAID>
+      <FIRST_NAME>Example Entity</FIRST_NAME>
+      <COMMENTS1>General notes without any address.</COMMENTS1>
+    </ENTITY>
+  </ENTITIES>
+</CONSOLIDATED_LIST>
