@@ -29,6 +29,7 @@ jobs:
         run: sanctions-address-lists run --output-dir dist
 
       - name: Upload lists as a build artifact
+        id: upload
         if: always() && steps.run_sources.outcome != 'cancelled'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -41,6 +42,7 @@ jobs:
         if: always() && steps.run_sources.outcome != 'cancelled'
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
         run: |
           python3 - <<'PY' > /tmp/pr-comment.md
           import json
@@ -68,12 +70,14 @@ jobs:
               lines.append(f"| `{e['source_id']}` | {cell} | {e['record_count']} | {e['address_count']} |")
 
           artifact_name = f"sanctions-address-lists-pr-{os.environ['PR_NUMBER']}"
-          lines += [
-              "",
-              f"Full CSV/JSON/TXT outputs and manifest.json are attached as the "
-              f"`{artifact_name}` build artifact on this workflow run (see the "
-              f"checks tab above).",
-          ]
+          artifact_url = os.environ.get("ARTIFACT_URL")
+          download_line = (
+              f"[Download `{artifact_name}`]({artifact_url}) (requires being signed "
+              "in to GitHub) for the full CSV/JSON/TXT outputs and manifest.json."
+              if artifact_url
+              else f"Artifact `{artifact_name}` was not uploaded (no output files were generated)."
+          )
+          lines += ["", download_line]
           print("\n".join(lines))
           PY
 
