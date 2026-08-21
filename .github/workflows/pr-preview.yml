@@ -1,0 +1,116 @@
+name: PR preview
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install -e . --no-deps
+
+      - name: Run all sources and generate outputs
+        id: run_sources
+        continue-on-error: true
+        run: sanctions-address-lists run --output-dir dist
+
+      - name: Upload lists as a build artifact
+        id: upload
+        if: always() && steps.run_sources.outcome != 'cancelled'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sanctions-address-lists-pr-${{ github.event.pull_request.number }}
+          path: dist/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Build PR comment body
+        if: always() && steps.run_sources.outcome != 'cancelled'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+        run: |
+          python3 - <<'PY' > /tmp/pr-comment.md
+          import json
+          import os
+
+          MARKER = "<!-- sanctions-address-lists-preview -->"
+          try:
+              entries = json.load(open("dist/manifest.json"))
+          except FileNotFoundError:
+              entries = []
+
+          icons = {"success": "✅", "unverified": "🟡", "unsupported": "⚪", "failed": "❌"}
+          lines = [
+              MARKER,
+              "### Sanctions address lists preview",
+              "",
+              "| Source | Status | Records | Addresses |",
+              "|---|---|---:|---:|",
+          ]
+          for e in entries:
+              status = e["status"]
+              cell = f"{icons.get(status, '❓')} {status}"
+              if status == "failed" and e.get("error"):
+                  cell += f"<br><sub>{e['error']}</sub>"
+              lines.append(f"| `{e['source_id']}` | {cell} | {e['record_count']} | {e['address_count']} |")
+
+          artifact_name = f"sanctions-address-lists-pr-{os.environ['PR_NUMBER']}"
+          artifact_url = os.environ.get("ARTIFACT_URL")
+          download_line = (
+              f"[Download `{artifact_name}`]({artifact_url}) (requires being signed "
+              "in to GitHub) for the full CSV/JSON/TXT outputs and manifest.json."
+              if artifact_url
+              else f"Artifact `{artifact_name}` was not uploaded (no output files were generated)."
+          )
+          lines += ["", download_line]
+          print("\n".join(lines))
+          PY
+
+      - name: Comment on PR
+        if: always() && steps.run_sources.outcome != 'cancelled'
+        uses: actions/github-script@d746ffe35508b1917358783b479e04febd2b8f71 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs')
+            const body = fs.readFileSync('/tmp/pr-comment.md', 'utf8')
+            const marker = '<!-- sanctions-address-lists-preview -->'
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            const existing = comments.find((c) => c.body.includes(marker))
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              })
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              })
+            }
+
+      - name: Fail the job if a gating source failed
+        if: steps.run_sources.outcome == 'failure'
+        run: exit 1
