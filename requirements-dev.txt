@@ -1,0 +1,18 @@
+# Pinned dev dependencies, generated with:
+#   python -m pip install -e ".[dev]" && python -m pip freeze
+# Regenerate after changing the `[project.optional-dependencies].dev` list
+# in pyproject.toml.
+-r requirements.txt
+Pygments==2.21.0
+iniconfig==2.3.0
+librt==0.15.0
+mypy==1.20.2
+mypy_extensions==1.1.0
+packaging==26.3
+pathspec==1.1.1
+pluggy==1.6.0
+pytest==8.4.2
+respx==0.22.0
+ruff==0.8.6
+types-defusedxml==0.7.0.20260504
+typing_extensions==4.16.0
