@@ -1,0 +1,52 @@
+<?xml version="1.0" standalone="yes"?>
+<sdnList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/XML">
+  <publshInformation>
+    <Publish_Date>08/18/2026</Publish_Date>
+    <Record_Count>3</Record_Count>
+  </publshInformation>
+  <sdnEntry>
+    <uid>36</uid>
+    <lastName>AEROCARIBBEAN AIRLINES</lastName>
+    <sdnType>Entity</sdnType>
+    <programList>
+      <program>CUBA</program>
+    </programList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>9000</uid>
+    <lastName>EXAMPLE CRYPTO ENTITY</lastName>
+    <sdnType>Entity</sdnType>
+    <programList>
+      <program>SDGT</program>
+    </programList>
+    <idList>
+      <id>
+        <uid>1001</uid>
+        <idType>Digital Currency Address - ETH</idType>
+        <idNumber>0x1234567890abcdef1234567890ABCDEF12345678</idNumber>
+      </id>
+      <id>
+        <uid>1002</uid>
+        <idType>Digital Currency Address - XBT</idType>
+        <idNumber>1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2</idNumber>
+      </id>
+      <id>
+        <uid>1003</uid>
+        <idType>Passport</idType>
+        <idNumber>0x1111111111111111111111111111111111111111</idNumber>
+      </id>
+    </idList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>9100</uid>
+    <lastName>EXAMPLE BAD LENGTH ENTITY</lastName>
+    <sdnType>Entity</sdnType>
+    <idList>
+      <id>
+        <uid>2001</uid>
+        <idType>Digital Currency Address - ARB</idType>
+        <idNumber>0xTOOSHORT</idNumber>
+      </id>
+    </idList>
+  </sdnEntry>
+</sdnList>

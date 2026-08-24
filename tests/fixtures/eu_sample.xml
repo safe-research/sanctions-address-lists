@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<export xmlns="http://eu.europa.ec/fpi/fsd/export" generationDate="2026-08-05T16:47:04.449+02:00" globalFileId="184961">
+  <sanctionEntity designationDetails="" unitedNationId="" euReferenceNumber="EU.1.1" logicalId="101">
+    <remark>Known blockchain wallet addresses: 0x1234567890abcdef1234567890ABCDEF12345678, also active on other chains.</remark>
+    <subjectType code="entity" classificationCode="E"/>
+    <nameAlias wholeName="Example Exchange" strong="true" logicalId="1"/>
+  </sanctionEntity>
+  <sanctionEntity designationDetails="" unitedNationId="" euReferenceNumber="EU.2.2" logicalId="102">
+    <remark>No crypto information here, just a general note about this listing.</remark>
+    <subjectType code="person" classificationCode="P"/>
+    <nameAlias firstName="John" lastName="Doe" wholeName="John Doe" strong="true" logicalId="2"/>
+  </sanctionEntity>
+  <sanctionEntity designationDetails="" unitedNationId="" euReferenceNumber="EU.3.3" logicalId="103">
+    <remark>Transaction reference 0xabababababababababababababababababababababababababababababab noted in filings.</remark>
+    <subjectType code="entity" classificationCode="E"/>
+  </sanctionEntity>
+  <sanctionEntity designationDetails="" unitedNationId="" euReferenceNumber="EU.4.4" logicalId="104">
+    <subjectType code="enterprise" classificationCode="E"/>
+    <nameAlias wholeName="Example Crypto Exchange" strong="true" logicalId="4">
+      <remark>Known blockchain wallet addresses:
+ETH: 0x2222222222222222222222222222222222222222
+BTC: bc1qwtz3zv95x2flu4w26kgfepf529z5</remark>
+    </nameAlias>
+  </sanctionEntity>
+</export>

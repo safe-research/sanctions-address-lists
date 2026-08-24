@@ -1,14 +1,21 @@
-"""Registry of all source adapters, in implementation-priority order.
-
-Empty for now -- adapters are registered here as they're added in
-subsequent PRs (see the "Adding a source adapter" section of the README).
-"""
+"""Registry of all source adapters, in implementation-priority order."""
 
 from __future__ import annotations
 
 from sanctions_address_lists.sources.base import SourceAdapter
+from sanctions_address_lists.sources.eu import EuAdapter
+from sanctions_address_lists.sources.ofac import OfacAdapter
+from sanctions_address_lists.sources.seco import SecoAdapter
+from sanctions_address_lists.sources.uk import UkAdapter
+from sanctions_address_lists.sources.un import UnAdapter
 
-ALL_SOURCES: tuple[type[SourceAdapter], ...] = ()
+ALL_SOURCES: tuple[type[SourceAdapter], ...] = (
+    OfacAdapter,
+    EuAdapter,
+    UkAdapter,
+    UnAdapter,
+    SecoAdapter,
+)
 
 
 def get_source(source_id: str) -> type[SourceAdapter]:
