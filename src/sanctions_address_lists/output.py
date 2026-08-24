@@ -55,9 +55,14 @@ def _json_bytes(result: SourceResult) -> bytes:
 
 
 def _txt_bytes(result: SourceResult) -> bytes:
+    # Always end with a newline, even for zero addresses. A genuinely empty
+    # (0-byte) file is rejected by GitHub's release-asset upload API ("Bad
+    # Content-Length"), and CSV/JSON already never produce 0 bytes either
+    # (they always have at least a header row / "[]") -- so a lone newline
+    # keeps all three formats consistently non-empty for a valid zero-address
+    # result, without adding a fake address line.
     addresses = sorted({link.address for link in result.links})
-    body = "\n".join(addresses)
-    return (body + "\n" if addresses else "").encode("utf-8")
+    return ("\n".join(addresses) + "\n").encode("utf-8")
 
 
 def write_source_outputs(result: SourceResult, out_dir: Path) -> list[str]:

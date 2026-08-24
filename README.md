@@ -132,7 +132,12 @@ address,jurisdiction,source,source_record_id,source_url
 
 **JSON** — a minimal sorted array of unique addresses: `["0x...", "0x..."]`.
 
-**TXT** — one sorted, unique, normalized address per line.
+**TXT** — one sorted, unique, normalized address per line. A source with zero
+addresses produces a file containing a single blank line rather than a
+literal 0-byte file — GitHub's release-asset upload API rejects genuinely
+empty files outright, and CSV/JSON are never 0 bytes either (they always
+have at least a header row / `[]`), so this keeps all three formats
+consistently non-empty for a valid zero-address result.
 
 CSV/JSON/TXT files never contain timestamps or other run-specific metadata,
 so identical inputs always produce byte-identical address files —
