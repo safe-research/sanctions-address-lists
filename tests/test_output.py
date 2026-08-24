@@ -69,7 +69,11 @@ def test_empty_links_produce_empty_but_valid_outputs(tmp_path: Path) -> None:
     generated = write_source_outputs(result, tmp_path)
     assert generated == ["csv/us-ofac.csv", "json/us-ofac.json", "txt/us-ofac.txt"]
     assert json.loads((tmp_path / "json" / "us-ofac.json").read_text()) == []
-    assert (tmp_path / "txt" / "us-ofac.txt").read_text() == ""
+    # Never a literal 0-byte file -- GitHub's release-asset upload API rejects
+    # those outright, and CSV/JSON are never 0 bytes either (header/"[]").
+    txt_path = tmp_path / "txt" / "us-ofac.txt"
+    assert txt_path.read_text() == "\n"
+    assert txt_path.stat().st_size > 0
 
 
 @pytest.mark.parametrize("status", ["failed", "unsupported", "unverified"])

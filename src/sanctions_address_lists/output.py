@@ -55,9 +55,10 @@ def _json_bytes(result: SourceResult) -> bytes:
 
 
 def _txt_bytes(result: SourceResult) -> bytes:
+    # Trailing newline even when empty -- GitHub's release-asset API rejects
+    # literal 0-byte files.
     addresses = sorted({link.address for link in result.links})
-    body = "\n".join(addresses)
-    return (body + "\n" if addresses else "").encode("utf-8")
+    return ("\n".join(addresses) + "\n").encode("utf-8")
 
 
 def write_source_outputs(result: SourceResult, out_dir: Path) -> list[str]:

@@ -132,7 +132,9 @@ address,jurisdiction,source,source_record_id,source_url
 
 **JSON** — a minimal sorted array of unique addresses: `["0x...", "0x..."]`.
 
-**TXT** — one sorted, unique, normalized address per line.
+**TXT** — one sorted, unique, normalized address per line (a zero-address
+source produces a single blank line, never a literal empty file — GitHub's
+release-asset API rejects those).
 
 CSV/JSON/TXT files never contain timestamps or other run-specific metadata,
 so identical inputs always produce byte-identical address files —
