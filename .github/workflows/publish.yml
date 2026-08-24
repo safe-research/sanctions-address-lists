@@ -1,11 +1,16 @@
 name: Publish sanctions address lists
-# Runs the full pipeline against live sources and keeps the "latest" GitHub
-# Release up to date with the results:
+# Runs the full pipeline against live sources and keeps published data up to
+# date with the results:
 #   - CSV/JSON/TXT assets are only re-uploaded when a source's address list
 #     actually changed since the last publish (byte-compared against the
 #     currently published release, see the "Check for changes" step below).
-#   - manifest.json is refreshed every run regardless, so its status/counts/
-#     retrieved_at stay current even on a day with no address changes.
+#   - On a changed day, a dated snapshot release (tag data-YYYY-MM-DD) is
+#     created alongside the stable "latest" release, so past states remain
+#     fetchable -- "latest" alone has no history once its assets are
+#     overwritten. No snapshot is created on a no-change day.
+#   - manifest.json on "latest" is refreshed every run regardless, so its
+#     status/counts/retrieved_at stay current even on a day with no address
+#     changes.
 #   - A source that fails doesn't block the others: whatever succeeded still
 #     gets published, and the job is marked failed for visibility.
 
@@ -75,15 +80,60 @@ jobs:
           rm -f /tmp/previous-release/manifest.json
 
           changed=false
+          changed_sources=()
           shopt -s nullglob
           for f in dist/csv/*.csv dist/json/*.json dist/txt/*.txt; do
             name="$(basename "$f")"
             if [ ! -f "/tmp/previous-release/$name" ] || ! cmp -s "$f" "/tmp/previous-release/$name"; then
               echo "changed: $name"
               changed=true
+              changed_sources+=("${name%.*}")
             fi
           done
           echo "changed=$changed" >> "$GITHUB_OUTPUT"
+
+          # Same source's csv/json/txt always change together (all derived
+          # from the same address set), so dedupe down to source IDs for a
+          # readable release-notes summary.
+          if [ ${#changed_sources[@]} -gt 0 ]; then
+            unique_sources="$(printf '%s\n' "${changed_sources[@]}" | sort -u | paste -sd, -)"
+          else
+            unique_sources=""
+          fi
+          echo "changed_sources=$unique_sources" >> "$GITHUB_OUTPUT"
+
+      - name: Publish dated snapshot release
+        # Creates (or updates, if this workflow already ran and published a
+        # change earlier today) a dated release alongside "latest", so past
+        # states of the address lists remain individually fetchable. Only
+        # created on a changed day -- a snapshot of an unchanged day would
+        # just duplicate the previous one.
+        if: always() && steps.run_sources.outcome != 'cancelled' && steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          FILES=(dist/csv/*.csv dist/json/*.json dist/txt/*.txt dist/manifest.json)
+
+          today="$(date -u +%Y-%m-%d)"
+          timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          date_tag="data-$today"
+          changed_sources="${{ steps.diff.outputs.changed_sources }}"
+          title="Sanctions address lists snapshot: $today"
+          notes="Snapshot of the generated address lists as of $timestamp. Changed sources: ${changed_sources:-(none detected)}. See manifest.json for per-source status, provenance, and counts."
+
+          if gh release view "$date_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$date_tag" --repo "$GITHUB_REPOSITORY" \
+              --title "$title" \
+              --notes "$notes"
+          else
+            gh release create "$date_tag" --repo "$GITHUB_REPOSITORY" \
+              --title "$title" \
+              --notes "$notes"
+          fi
+
+          gh release upload "$date_tag" "${FILES[@]}" --repo "$GITHUB_REPOSITORY" --clobber
 
       - name: Publish release assets (lists changed)
         # Publish whatever succeeded even if a gating source failed above, so a

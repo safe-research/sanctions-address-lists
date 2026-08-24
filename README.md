@@ -194,6 +194,22 @@ changes. `manifest.json` is handled separately and is always refreshed
 it's excluded from the change comparison since it always contains volatile,
 per-run fields.
 
+### Historical snapshots
+
+Because `latest`'s assets are overwritten in place, it alone has no history —
+fetching `us-ofac.csv` today tells you nothing about what it looked like last
+month. On any day the lists actually change, the same files are *also*
+published to a dated release tagged `data-YYYY-MM-DD` (UTC), giving a
+permanent, individually fetchable snapshot:
+
+```
+https://github.com/safe-research/sanctions-address-lists/releases/download/data-2026-08-24/us-ofac.csv
+```
+
+No snapshot is created on a day with no changes — that would just duplicate
+the previous one. Each snapshot's release notes list which sources changed
+since the prior snapshot.
+
 ## Update cadence
 
 - **`publish.yml`** (main branch) runs on a daily schedule and can also be
