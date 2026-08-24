@@ -89,19 +89,30 @@ jobs:
         # Publish whatever succeeded even if a gating source failed above, so a
         # single broken source doesn't withhold every other source's update.
         # The job's overall status still reflects the failure for visibility.
+        # Uses the gh CLI (bundled with the runner) instead of a third-party
+        # action, so this step needs no org-level Action allowlisting.
         if: always() && steps.run_sources.outcome != 'cancelled' && steps.diff.outputs.changed == 'true'
-        uses: softprops/action-gh-release@fe965f7af51af5f2602596916f38a38df2e33de0 # v3.0.2
-        with:
-          tag_name: latest
-          name: Latest sanctions address lists
-          body: >
-            Automatically updated when the generated address lists change.
-            See manifest.json for per-source status, provenance, and counts.
-          files: |
-            dist/csv/*.csv
-            dist/json/*.json
-            dist/txt/*.txt
-            dist/manifest.json
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          FILES=(dist/csv/*.csv dist/json/*.json dist/txt/*.txt dist/manifest.json)
+
+          title="Latest sanctions address lists"
+          notes="Automatically updated when the generated address lists change. See manifest.json for per-source status, provenance, and counts."
+
+          if gh release view latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit latest --repo "$GITHUB_REPOSITORY" \
+              --title "$title" \
+              --notes "$notes"
+          else
+            gh release create latest --repo "$GITHUB_REPOSITORY" \
+              --title "$title" \
+              --notes "$notes"
+          fi
+
+          gh release upload latest "${FILES[@]}" --repo "$GITHUB_REPOSITORY" --clobber
 
       - name: Refresh manifest.json only (no list changes today)
         # Keeps the published manifest's retrieved_at/status/counts current
